@@ -1,21 +1,40 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Text.Json;
+using Crm.Data;
+using Microsoft.EntityFrameworkCore;
 using Crm.Models;
 using Crm.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<CrmDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Crm")));
 
 // Customers: choose one implementation
+builder.Services.AddScoped<ICustomerService, EfCustomerService>();
 //builder.Services.AddScoped<ICustomerService, JsonCustomerService>();
 //builder.Services.AddScoped<ICustomerService, XmlCustomerService>();
-builder.Services.AddSingleton<ICustomerService, InMemoryCustomerService>(); // Singleton: the list must live as long as the app
+//builder.Services.AddSingleton<ICustomerService, InMemoryCustomerService>(); // Singleton: the list must live as long as the app
 
 // Activities: choose one implementation
+builder.Services.AddScoped<IActivityService, EfActivityService>();
 //builder.Services.AddScoped<IActivityService, JsonActivityService>();
 //builder.Services.AddScoped<IActivityService, XmlActivityService>();
-builder.Services.AddSingleton<IActivityService, InMemoryActivityService>();
+//builder.Services.AddSingleton<IActivityService, InMemoryActivityService>();
 
 var app = builder.Build();
+
+// Seed the database from customers.json the first time
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CrmDbContext>();
+    if (!db.Customers.Any())
+    {
+        var customers = JsonSerializer.Deserialize<List<Customer>>(File.ReadAllText("customers.json")) ?? new();
+        foreach (var c in customers) c.Id = 0; // let SQL Server assign Id
+        db.Customers.AddRange(customers);
+        db.SaveChanges();
+    }
+}
 
 app.UseStaticFiles(); // serves wwwroot (css and js)
 
