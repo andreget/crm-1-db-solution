@@ -9,13 +9,13 @@
 @customerId = 2
 
 # Set to the "id" in the response of "Create customer"
-@newCustomerId = 6
+@newCustomerId = 8
 
 # Set to the "id" in the response of "Create activity"
-@activityId = 1
+@activityId = 5
 
 # Set to the "id" in the response of step 1 in the challenge at the bottom
-@tempCustomerId = 7
+@tempCustomerId = 9
 
 
 ### Part 1: Warm-up

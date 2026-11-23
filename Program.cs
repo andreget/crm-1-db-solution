@@ -10,13 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CrmDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Crm")));
 
 // Customers: choose one implementation
-builder.Services.AddScoped<ICustomerService, EfCustomerService>();
+//builder.Services.AddScoped<ICustomerService, EfCustomerService>();
+builder.Services.AddScoped<ICustomerService, DapperCustomerService>();
 //builder.Services.AddScoped<ICustomerService, JsonCustomerService>();
 //builder.Services.AddScoped<ICustomerService, XmlCustomerService>();
 //builder.Services.AddSingleton<ICustomerService, InMemoryCustomerService>(); // Singleton: the list must live as long as the app
 
 // Activities: choose one implementation
-builder.Services.AddScoped<IActivityService, EfActivityService>();
+//builder.Services.AddScoped<IActivityService, EfActivityService>();
+builder.Services.AddScoped<IActivityService, DapperActivityService>();
 //builder.Services.AddScoped<IActivityService, JsonActivityService>();
 //builder.Services.AddScoped<IActivityService, XmlActivityService>();
 //builder.Services.AddSingleton<IActivityService, InMemoryActivityService>();
